@@ -1,0 +1,59 @@
+body {
+  background-color: #494455;
+  display: block;
+}
+
+#game-container {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 550px;
+  height: 800px;
+  border: #000;
+  border-style: solid;
+}
+
+#wordle-title .game-text {
+  justify-content: center;
+}
+
+#wordle-solved-text {
+  margin: 0;
+  line-height: 25px;
+}
+
+#nav-bar {
+  display: flex;
+  flex-direction: row;
+  border-top: 0.5px solid #000000;
+  justify-content: space-around;
+  height: 22px;
+}
+
+#game-grid {
+  width: 327px;
+  height: 332.5px;
+  border: 0.5px solid #000000;
+}
+
+.button {     
+  background-color: Transparent;
+  background-repeat:no-repeat;
+  border: none;
+  cursor:pointer;
+  overflow: hidden;
+}
+
+@font-face {
+  font-family: 'Just Another Hand';
+  src: url('/assets/JustAnotherHand-Regular.ttf');
+  /* downloaded the font file from google font https://fonts.google.com/specimen/Just+Another+Hand?query=just+another+hand */
+  /* learned to download font and use for project by using the file path */
+}
+
+.game-text {
+  font-family: 'Just Another Hand';
+  color: #fff;
+  filter: drop-shadow(-1px 2px 1px #000)
+}
+

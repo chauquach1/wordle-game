@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WORDLE</title>
+  <script src="./js/app.js" defer></script>
+  <link rel="stylesheet" href="./css/styles.css">
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet"> -->
+</head>
+<body>
+  <div id="game-container">
+    <h1 id="wordle-title" class="game-text">WORDLE</h1>
+    <div id="game-nav-container">
+      <nav id="nav-bar">
+        <button id="instructions-btn" class="game-text button">How to Play</button>
+        <p id="wordle-solved-text" class="game-text">You Solved The Wordle!</p>
+        <button id="new-wordle-btn" class="game-text button">Different Wordle Please!</button>
+      </nav>
+    </div>
+    <div id="game-grid-container">
+      <div id="game-grid"></div>
+    </div>
+    <div id="keyboard-container">
+      <div id="keyboard-keys-container"></div>
+      <div id="delete-enter-btns"></div>
+    </div>
+  </div>
+</body>
+</html>
