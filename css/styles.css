@@ -1,59 +1,86 @@
+
+
 body {
   background-color: #494455;
-  display: block;
 }
 
 #game-container {
-  position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 550px;
-  height: 800px;
+  width: 1100px;
+  height: 1000px;
   border: #000;
   border-style: solid;
 }
 
-#wordle-title .game-text {
-  justify-content: center;
-}
-
-#wordle-solved-text {
-  margin: 0;
-  line-height: 25px;
+#grid-nav-container {
+  display: block;
 }
 
 #nav-bar {
   display: flex;
   flex-direction: row;
-  border-top: 0.5px solid #000000;
-  justify-content: space-around;
-  height: 22px;
+  justify-content: space-between;
 }
 
 #game-grid {
+  display: grid;
+  grid-template-rows: (6, auto);
+  grid-template-columns: (5, auto);
   width: 327px;
   height: 332.5px;
   border: 0.5px solid #000000;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tile {
+  width: 52px;
+  height: 52.5px;
+  border: 2px solid black;
+  border-radius: 5px;
+  margin: 4px;
+  text-transform: uppercase; /* 'CSS property specifies how to capitalize an element's text' - MDN */
+  color: white;
+  display: grid;
+  place-items: center; /* sets both align-items and justify-items */
+  font-family: 'Tile Text';
+  font-size: 2rem; /*"'root em', a unit of measurement that represents the font size of the root element" - https://www.sitepoint.com/understanding-and-using-rem-units-in-css/ */
 }
 
 .button {     
   background-color: Transparent;
-  background-repeat:no-repeat;
   border: none;
-  cursor:pointer;
-  overflow: hidden;
+  cursor: pointer;
+}
+.game-text {
+  font-family: 'Main Text';
+  color: #fff;
+  filter: drop-shadow(-2px 3px 2px #000);
+  font-size: 40px;
+  text-align: center;
 }
 
-@font-face {
-  font-family: 'Just Another Hand';
+.nav-item {
+  width:33%;
+  text-align: center;
+}
+
+#wordle-title {
+  font-size: 100px;
+}
+
+@font-face { 
+  /* "specifies a custom font with which to display text; the font can be loaded from either a remote server or a locally-installed font on the user's own computer." - MDN */
+  font-family: 'Main Text'; /* Can rename font-family for easier reference*/
   src: url('/assets/JustAnotherHand-Regular.ttf');
-  /* downloaded the font file from google font https://fonts.google.com/specimen/Just+Another+Hand?query=just+another+hand */
+  /* downloaded from google font https://fonts.google.com/specimen/Just+Another+Hand?query=just+another+hand */
   /* learned to download font and use for project by using the file path */
 }
 
-.game-text {
-  font-family: 'Just Another Hand';
-  color: #fff;
-  filter: drop-shadow(-1px 2px 1px #000)
+@font-face {
+  font-family: 'Tile Text';
+  src: url('/assets/Bungee-Regular.ttf')
+  /* downloaded from google font https://fonts.google.com/specimen/Bungee?query=bunge */
 }
 
