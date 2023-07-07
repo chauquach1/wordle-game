@@ -10,19 +10,40 @@
 <body>
   <div id="game-container">
     <h1 id="wordle-title" class="game-text">WORDLE</h1>
-    <div id="grid-nav-container">
-      <div id="game-nav-container">
+    <div id="nav-grid-container">
+      <div id="nav-container">
         <nav id="nav-bar">
-          <div class="nav-item ">
+          <div id="nav-instructions" class="nav-item ">
             <button id="instructions-btn" class="game-text button">How to Play</button>
           </div>
           <div id="wordle-solved-text" class="nav-item game-text">You Solved The Wordle!</div>
-          <div class="nav-item">
+          <div id="nav-new-wordle" class="nav-item">
             <button id="new-wordle-btn" class="game-text button">Different Wordle Please!</button>
           </div>
         </nav>
       </div>
-      <div id="game-grid"></div>
+      <div id="instructions-tiles-results-div">
+        <aside id="instructions-aside" class="game-text aside">
+          <ol class="instructions-ol">
+            <li>You have <u>six</u> tries to guess the five-letter word!</li><br>
+            <li>Type in your guess and submit your word.</li><br>
+            <li>The tiles will turn <u><span style="color:#3FA004">Green</span></u> if the letter is present and in the correct spot. The tile will turn <u><span style="color:#B4AC0A">Yellow</span></u> if you guessed the right letter, but it's in the wrong spot. A <u><span style="color:#2d2d2d">Gray</span></u> tile means that the letter is not included in the word!</li><br>
+            <li>Keep guessing until you solve the Wordle!</li>
+          </ol>
+        </aside>
+        <div id="game-tiles-div">
+          <div id="game-tiles"></div>
+        </div>
+        <aside id="results-aside" class="game-text aside">
+          <ul class="results-ul">
+            <li id="games-played-tracker" class="results-li">Games Played: <span id="games-played">0</span></li>
+            <li id="win-rate-tracker" class="results-li">Win %: <span id="win-rate">0%</span></li>
+            <li id="curr-win-streak-tracker" class="results-li">Current Win Streak: <span id="curr-win-streak">0</span></li>
+            <li id="longest-win-streak-tracker" class="results-li">Longest Win Streak: <span id="longest-win-streak">0</span></li>
+          </ul>
+          <button id="new-game-btn" class="game-text button">Play Again!</button>
+        </aside>
+      </div>
     </div>
     <div id="keyboard-container">
       <div id="keyboard-keys-container"></div>

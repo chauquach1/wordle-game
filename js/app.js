@@ -14,7 +14,7 @@ function createTile(row, col, char = '') {
     tile.id = `tile${row}${col}`;
     tile.textContent = char;
   // Append tile (child) to grid (parent)
-  const gameGrid = document.getElementById('game-grid')
+  const gameGrid = document.getElementById('game-tiles')
   gameGrid.appendChild(tile)
 }
 

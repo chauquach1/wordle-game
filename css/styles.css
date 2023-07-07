@@ -13,7 +13,7 @@ body {
   border-style: solid;
 }
 
-#grid-nav-container {
+#nav-grid-container {
   display: block;
 }
 
@@ -23,7 +23,61 @@ body {
   justify-content: space-between;
 }
 
-#game-grid {
+#instructions-tiles-results-div {
+  display: flex;
+  justify-content: space-around;
+  height: 349px;
+  margin-top: 5px;
+  margin-bottom: 50px;
+}
+
+.aside {
+  display: flex;
+  margin-top: 5px;
+  padding: 8px 5px 8px 5px;
+  height: 70%;
+  width: 25%;
+  background-color: #fff1c5;
+  align-items: center;
+}
+
+#game-tiles-div {
+  height: 349px;
+}
+
+#instructions-aside {
+  transform: translateX(5px);
+}
+
+#results-aside {
+  transform: translateX(-7px);
+  flex-direction: column;
+}
+
+.instructions-ol {
+  padding-left: 18px;
+  text-align: left;
+  color: #000000;
+  margin: 0px;
+  font-size: 25px;
+  line-height: 22px;
+}
+
+.results-ul {
+  list-style-type: none;
+  color: #000;
+  text-align: left;
+  padding-left: 5px;
+  margin-top: 0px;
+  align-self:baseline
+}
+
+.results-ul .button {
+  color: #4b4261;
+  filter: drop-shadow(-1px 2px 3px #7d7d7d);
+}
+
+#game-tiles {
   display:flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -125,7 +179,9 @@ body {
   background-color: Transparent;
   border: none;
   cursor: pointer;
+  padding: 0px;
 }
+
 .game-text {
   font-family: 'Main Text';
   color: #fff;
