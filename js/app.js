@@ -8,14 +8,14 @@ let gameProgress = {
     ['','','','',''], 
     ['','','','','']
   ],
-  row: 0,
-  col: 0
+  currRow: 0,
+  currCol: 0,
+  currGuess: ''
 }
 
 function startup () {
   generateKeys()
   generateGrid()
-  keyboardLister ()
 }
 startup()
 
@@ -80,7 +80,9 @@ function generateKeys () {
       // Add 'click' functionality to DOM keyboard
       characterKey.addEventListener('click', (input) => {
         input.key = character
-        isCharKey(input)
+        if(isCharKey(input.key)) {
+          characterInputLister(input.key)
+        }
       })
       keyboardRow.append(characterKey)
     }
@@ -88,53 +90,47 @@ function generateKeys () {
 }
 
 // Check if keyboard input is a valid character
-function isCharKey (key) {
-  // key.length is used because the 'key' property can return "Enter", "Escape", "Space", etc.
-  // key.match uses a regexp that matches the 'key' value to an letter within the range 'a' to 'z' while ignoring case (upper or lower) using the 'i' flag
+function isCharKey (input) {
+  // input.length is used because the 'key' property from eventListener can return "Enter", "Escape", "Space", etc.
+  // input.match uses a regexp that matches the 'key' value from eventListener to letter within the range 'a' to 'z' while ignoring case (upper or lower) using the 'i' flag
   // isCharKey() will return false if any other input is pressed
-      // console.log(key); <-- Used to check if input is being read
-    return (key.length === 1 && key.match(/[a-z]/i));
+            // console.log(input); // <-- Used to check if input is being read
+    return input.length === 1 && input.match(/[a-z]/i);
 }
 
-
-
-
-
-
-
-function keyboardLister () {
-  let row = 0;
-  let col = 0;
-  let currRow = gameProgress.row;
-  let currCol = gameProgress.col;
-  let currGuess = '';
-  document.addEventListener('keydown', (input) => {
-    let currTile = document.getElementById(`tile${row}${col}`);
-      if (!isCharKey(input.key)) {
-        if (input.key == 'Enter'){
-          console.log(currGuess);
-          col = 0;
-          row ++;
-          // return // <-- delete when submitAnswer() function declared
-        } else if (input.key == 'Backspace') {
-          // deleteCharacter();
-          return //<-- delete when deleteCharacter() function declared
-        }
-      } else if (col <= 5 && currTile) {
-          currTile.textContent = input.key;
-          currGuess.concat(input.key)
-                        // logs current tile positioning is accurate and checks if conditionals are true
-                          console.log('currTile: ', currTile);
-                          console.log('row: ' + row);
-                          console.log('col: ' + col);
-                          console.log('currRow: ' + currRow);
-                          console.log('currCol: ' + currCol);
-                          console.log('input key: ', input.key)
-          col ++;
-          currCol ++;
-      }
-    })
+// Allow for user input via physical keyboard presses
+document.addEventListener('keydown', (input) => {
+  if (isCharKey(input.key)) {
+      characterInputLister(input.key.toLowerCase())
+  } else if (input.key == 'Enter'){
+      // submitGuess(input.key)
+      console.log('Enter key: ', input.key.toLowerCase())
+  } else if (input.key == 'Backspace') {
+      // deleteCharacter(input.key);
+      console.log('Delete key: ', input.key)
   }
+})
+
+
+
+
+function characterInputLister (input) {
+  let currRow = gameProgress.currRow;
+  let currCol = gameProgress.currCol;
+  let currTile = document.getElementById(`tile${currRow}${currCol}`);
+  
+  if (currCol <= 5 && currTile) {
+    currTile.textContent = input;
+    gameProgress.currGuess += input;
+    gameProgress.currCol += 1;
+      // useful console.logs
+          console.log('input key: ', input)  // <-- logs all inputs (DOM keyboard and user's keyboard)
+          // console.log('currGuess: ', gameProgress.currGuess); // <-- tracks user's current guess attempt
+          // console.log('currTile: ', currTile); // <-- tracks current tile being affected
+          // console.log('currRow: ' + currRow); // <-- used as a cross reference with tile.id
+          // console.log('currCol: ' + currCol); //  <-- used as a cross reference with tile.id
+    }
+}
 
 
 // create guessInput()
