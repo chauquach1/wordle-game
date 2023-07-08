@@ -8,13 +8,6 @@ body {
   margin-left: auto;
   margin-right: auto;
   width: 1100px;
-  height: 1000px;
-  border: #000;
-  border-style: solid;
-}
-
-#nav-grid-container {
-  display: block;
 }
 
 #nav-bar {
@@ -25,33 +18,35 @@ body {
 
 #instructions-tiles-results-div {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   height: 349px;
   margin-top: 5px;
   margin-bottom: 50px;
+}
+
+.side-div {
+  display: flex;
+  flex-direction: column;
+  width: 25%;
+  height: 100%;
 }
 
 .aside {
   display: flex;
   margin-top: 5px;
   padding: 8px 5px 8px 5px;
-  height: 70%;
-  width: 25%;
-  background-color: #fff1c5;
+  background-color: #ebdca8;
   align-items: center;
 }
 
 #game-tiles-div {
+  width: 33%;
   height: 349px;
 }
 
-#instructions-aside {
-  transform: translateX(5px);
-}
-
 #results-aside {
-  transform: translateX(-7px);
   flex-direction: column;
+  line-height: 130%;
 }
 
 .instructions-ol {
@@ -69,15 +64,12 @@ body {
   text-align: left;
   padding-left: 5px;
   margin-top: 0px;
-  align-self:baseline
-}
-
-.results-ul .button {
-  color: #4b4261;
-  filter: drop-shadow(-1px 2px 3px #7d7d7d);
+  margin-bottom: 5%;
+  align-self:baseline;
 }
 
 #game-tiles {
+  position: relative;
   display:flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -91,17 +83,18 @@ body {
 
 /* Default Tile */
 .tile {
-  background-color: #C3C3C3;
+  display: flex;
+  background-color: #878787;
   width: 52px;
   height: 52.5px;
   border: 2px solid black;
   border-radius: 5px;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
   margin: 1px;
-  text-transform: uppercase; /* 'CSS property specifies how to capitalize an element's text' - MDN */
-  place-items: center; /* sets both align-items and justify-items */
+  justify-content:space-evenly;
   font-family: 'Tile Text';
-  font-size: 2rem; /*"'root em', a unit of measurement that represents the font size of the root element" - https://www.sitepoint.com/understanding-and-using-rem-units-in-css/ */
+  color: #fff;
+  font-size: 2.2rem; /*"'root em', a unit of measurement that represents the font size of the root element" - https://www.sitepoint.com/understanding-and-using-rem-units-in-css/ */
 }
 
 /* Tile Backgrounds after Submitted Attempts */
@@ -116,10 +109,10 @@ body {
 }
 
 #keyboard-container {
-  background-color: #2d2d2d;
+  background-color: #393543;
   border: #000;
   border-style: solid;
-  border-radius: 1%;
+  border-radius: 9px;
   width: 50%;
   height: 200px;
   margin: 20px auto auto auto;
@@ -175,13 +168,6 @@ body {
   background-color: #4BC157;
 }
 
-.button {     
-  background-color: Transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0px;
-}
-
 .game-text {
   font-family: 'Main Text';
   color: #fff;
@@ -190,13 +176,24 @@ body {
   text-align: center;
 }
 
+.button {     
+  background-color: Transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0px;
+  color: #fff;
+}
+
+
 .nav-item {
   width:33%;
   text-align: center;
 }
 
 #wordle-title {
-  font-size: 100px;
+  font-size: 90px;
+  margin-top: 50px;
+  margin-bottom: 0px;
 }
 
 @font-face { 
