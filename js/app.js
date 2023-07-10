@@ -14,8 +14,9 @@ let gameProgress = {
 }
 
 function startup () {
-  generateKeys()
+  generateKeyboard()
   generateGrid()
+  keyboardEventListener()
 }
 startup()
 
@@ -24,7 +25,7 @@ startup()
   // "row" argument will be assigned via loop
   // "col" aka "column" will be assigned via loop
   // "char" or "character" will be assigned via user input
-function createTile(row, col, char = '') {
+function createTile(row, col) {
   const tile = document.createElement('div');
   // use .className and .id instead of setAttribute() to be less verbose
     // "The className property of the Element interface gets and sets the value of the class attribute of the specified element." - MDN
@@ -34,7 +35,7 @@ function createTile(row, col, char = '') {
     // "The textContent property of the Node interface represents the text content of the node and its descendants." - MDN
     tile.className = 'tile';
     tile.id = `tile${row}${col}`;
-    tile.textContent = char;
+    tile.textContent = '';
   // Append tile (child) to grid (parent)
   const gameGrid = document.getElementById('game-tiles')
   gameGrid.appendChild(tile)
@@ -58,7 +59,8 @@ function generateGrid() {
   // create a for loop that iterates each nested array (row of characters)
     // create a div for each key within that current row
     // give each div the ability to act as a virtual keyboard using event listener
-function generateKeys () {
+function generateKeyboard () {
+  // generating keyboard character keys
   const keyboard = [
     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
     ["A", "S", "D", "F", "G", "H", "J", "K", "L",],
@@ -77,17 +79,45 @@ function generateKeys () {
       const characterKey = document.createElement('div');
       characterKey.setAttribute('class', 'char-key');
       characterKey.id = character + " Key";
-      characterKey.innerText = character;
+      characterKey.textContent = character;
       // Add 'click' functionality to DOM keyboard
       characterKey.addEventListener('click', (input) => {
         input.key = character.toLowerCase();
         if(isCharKey(input.key)) {
-          keyInputLister(input.key);
+          updateTile(input.key);
         }
       })
       keyboardRow.append(characterKey);
     }
   }
+  // generate 'submit' and 'delete' keys that act like physical counterparts
+  const deleteSubmitKeysContainer = document.getElementById('delete-submit-keys-container')
+  const nonCharKeys = [['delete-key','delete', 'Backspace'], ['submit-key','submit', 'Enter']];
+  for (let i = 0; i < nonCharKeys.length; i++) {
+    const button = document.createElement('button');
+    button.classList.add('non-char-keys');
+    button.id = nonCharKeys[i][0];
+    button.textContent = nonCharKeys[i][1]
+    button.addEventListener('click', (click) => {
+      click.key = nonCharKeys[i][2]
+      updateTile(click.key)
+    })
+    deleteSubmitKeysContainer.appendChild(button)
+  }
+    // // delete key
+    // const deleteKey = document.createElement('button');
+    // deleteKey.classList.add('non-char-keys');
+    // deleteKey.id = 'delete-key';
+    // deleteKey.textContent = 'delete'
+    // deleteSubmitKeysContainer.appendChild(deleteKey);
+    // // submit key
+    // const submitKey = document.createElement('button');
+    // submitKey.classList.add('non-char-keys');
+    // submitKey.id = 'submit-key';
+    // submitKey.textContent = 'submit'
+    // deleteSubmitKeysContainer.appendChild(submitKey);
+    // // give both keys an event listener
+
 }
 
 
@@ -99,53 +129,80 @@ function isCharKey (input) {
 };
 
 // DOM event listener for user input via physical keyboard presses
+function keyboardEventListener () {
 document.addEventListener('keydown', (input) => {
-  if (isCharKey(input.key)) {
-    keyInputLister(input.key.toLowerCase());
-  } else if (input.key === 'Enter') {
-    checkGuess();
-  } else if (input.key === 'Backspace') {
-    // deleteCharacter();
-    console.log(input.key)
-  }
-});
+    if (isCharKey(input.key) || input.key === 'Enter' || input.key === 'Backspace') {
+      updateTile(input.key)
+    } 
+    else {return};
+  });
+}
 
 
-
-function keyInputLister (input) {
+function updateTile (input) {
+  let grid = gameProgress.grid;
   let currRow = gameProgress.currRow;
   let currCol = gameProgress.currCol;
-  let currTile = document.getElementById(`tile${currRow}${currCol}`);
-  if ((currCol >= 0 && currCol <= 4) && currTile) {
+  let currTile = document.getElementById(`tile${currRow}${currCol}`)
+  let prevTile = document.getElementById(`tile${currRow}${currCol-1}`)
+
+  if (input === 'Enter') {
+    checkGuess();
+  }
+
+  if (input === 'Backspace') {
+    if (gameProgress.currCol === 0) {
+      return
+    } else {
+      prevTile.textContent = '';  // <-- remove previous tile.textContent
+      gameProgress.currCol -= 1; // <-- move to previous tile, which is now empty
+      grid[gameProgress.currRow][gameProgress.currCol] = ''; // <-- updates grid to reflect character removal
+      return
+    }
+  }
+  
+  else if ((currCol >= 0 && currCol < 5) && currTile) {
+    input = input.toLowerCase()
+    grid[gameProgress.currRow][gameProgress.currCol] = input; // <-- updates grid with character addition
     currTile.textContent = input; // <-- set's tile character
-    gameProgress.currGuess += input; // <-- updates current guess per character input
-    gameProgress.currCol += 1; // <-- after each input, go to next tile
+    gameProgress.currCol ++; // <-- after each input, go to next tile
+    return
   };
 
-  // useful console.logs
+  // useful console.logs (use only before currCOl += 1)
+    // console.log('key pressed: ', input); // <-- check for 'keydown' event and which key was pressed
+    // console.log('curr grid row and grid col: ', grid.indexOf(grid[currRow]), 'x', grid[currRow].indexOf(input))
+    // console.log('curr grid text at curr grid row x curr grid col: ', grid[currRow][currCol]);
+    // console.log(grid[currRow]);
     // console.log('input key: ', input)  // <-- logs all character inputs (DOM keyboard and user's keyboard)
-    // console.log('currCol: ' + currCol); //  <-- used as a cross reference with tile.id (place before currCol += 1)
-    // console.log('currRow: ' + currRow); // <-- used as a cross reference with tile.id (place before currCol += 1)
+    // console.log('currCol: ' + currCol); //  <-- used as a cross reference with tile.id
+    // console.log('currRow: ' + currRow); // <-- used as a cross reference with tile.id
     // console.log('currGuess: ', gameProgress.currGuess); // <-- tracks user's current guess attempt
-    // console.log('currTile: ', currTile); // <-- tracks current tile being affected (place before currCol += 1)
-
+    // console.log('currTile: ', currTile); // <-- tracks current tile being affected
 }
 
 
 
 function checkGuess () {
-  if (gameProgress.currGuess.length === 5) {
-    if (wordList.includes(gameProgress.currGuess) || guessList.includes(gameProgress.currGuess)) {
-      // console.log('guess present in either list: ', gameProgress.currGuess);
-      if (gameProgress.currGuess === gameProgress.wordle) {
-        console.log('correct guess: ', gameProgress.currGuess);
+  if (gameProgress.currRow > 5) {
+    return
+  }
+
+  const grid = gameProgress.grid;
+  const guessString = grid[gameProgress.currRow].join('');
+  
+  if (guessString.length === 5) {
+    if (wordList.includes(guessString) || guessList.includes(guessString)) {
+      console.log('guess present in either list: ', guessString);
+      if (guessString === gameProgress.wordle) {
+        console.log('correct guess: ', guessString);
         showGuess() 
           // checks each character, its index and adds .correct class and animation to each tile
         // newGame()
           // updates game stats
           // resets tiles to default, changes wordle, and resets currCol/currRow to 0
       } else {
-          console.log('incorrect guess: ', gameProgress.currGuess);
+          console.log('incorrect guess: ', guessString);
           showGuess()
           nextRow();
       }
@@ -154,7 +211,12 @@ function checkGuess () {
   }
 
   function nextRow () {
+    if (gameProgress.currRow === 5) {
+      return
+    }
+    // console.log('currRow: ', gameProgress.currRow);
     gameProgress.currRow++;
+    // console.log('new currRow after submit: ', gameProgress.currRow);
     gameProgress.currCol = 0;
     gameProgress.currGuess = '';
   }
@@ -168,8 +230,7 @@ function checkGuess () {
           //turn the tile "yellow"
         // else turn the tile "grey"
   function showGuess () {
-    console.log('**guess animation happening**');
+    console.log(gameProgress.currGuess);
   }
 
 }
-
