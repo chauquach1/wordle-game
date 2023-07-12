@@ -1,5 +1,6 @@
 let gameProgress = {
-  wordle: 'blast',
+  wordle: wordList[Math.floor(Math.random() * wordList.length) + 1],
+  // wordle: 'holty',
   grid: [
     ['','','','',''], 
     ['','','','',''], 
@@ -10,10 +11,16 @@ let gameProgress = {
   ],
   currRow: 0,
   currCol: 0,
-  currGuess: ''
+  currGuess: '',
+  gamesPlayed: 0,
+  gamesWon: 0,
+  winRate: Math.floor(this.gamesWon/this.gamesPlayed * 100),
+  currWinStreak: 0,
+  longestStreak: 0
 }
 
 function startup () {
+  console.log(gameProgress.wordle);
   generateKeyboard()
   generateGrid()
   keyboardEventListener()
@@ -75,7 +82,7 @@ function generateKeyboard () {
     keyboardContainer.appendChild(keyboardRow);
     
     for (let j = 0; j < row.length; j++) {
-      const character = row[j];
+      const character = row[j].toLowerCase();
       const characterKey = document.createElement('div');
       characterKey.setAttribute('class', 'char-key');
       characterKey.id = character + " Key";
@@ -90,6 +97,7 @@ function generateKeyboard () {
       keyboardRow.append(characterKey);
     }
   }
+
   // generate 'submit' and 'delete' keys that act like physical counterparts
   const deleteSubmitKeysContainer = document.getElementById('delete-submit-keys-container')
   const nonCharKeys = [['delete-key','delete', 'Backspace'], ['submit-key','submit', 'Enter']];
@@ -104,20 +112,6 @@ function generateKeyboard () {
     })
     deleteSubmitKeysContainer.appendChild(button)
   }
-    // // delete key
-    // const deleteKey = document.createElement('button');
-    // deleteKey.classList.add('non-char-keys');
-    // deleteKey.id = 'delete-key';
-    // deleteKey.textContent = 'delete'
-    // deleteSubmitKeysContainer.appendChild(deleteKey);
-    // // submit key
-    // const submitKey = document.createElement('button');
-    // submitKey.classList.add('non-char-keys');
-    // submitKey.id = 'submit-key';
-    // submitKey.textContent = 'submit'
-    // deleteSubmitKeysContainer.appendChild(submitKey);
-    // // give both keys an event listener
-
 }
 
 
@@ -147,7 +141,7 @@ function updateTile (input) {
   let prevTile = document.getElementById(`tile${currRow}${currCol-1}`)
 
   if (input === 'Enter') {
-    checkGuess();
+    checkLength();
   }
 
   if (input === 'Backspace') {
@@ -182,55 +176,144 @@ function updateTile (input) {
 }
 
 
-
-function checkGuess () {
-  if (gameProgress.currRow > 5) {
-    return
-  }
-
+// check for length of currGuess
+function checkLength () {
   const grid = gameProgress.grid;
   const guessString = grid[gameProgress.currRow].join('');
-  
   if (guessString.length === 5) {
+    isValidGuess(guessString);
+  } else {
+    return;
+  }
+
+  // check if guess is a usable word
+  function isValidGuess () {
     if (wordList.includes(guessString) || guessList.includes(guessString)) {
-      console.log('guess present in either list: ', guessString);
-      if (guessString === gameProgress.wordle) {
-        console.log('correct guess: ', guessString);
-        showGuess() 
-          // checks each character, its index and adds .correct class and animation to each tile
-        // newGame()
-          // updates game stats
-          // resets tiles to default, changes wordle, and resets currCol/currRow to 0
+      gameProgress.currGuess = guessString;
+      checkGuess(guessString)
+    }
+  }
+}
+
+
+
+function checkGuess (guessString) {
+  const wordle = gameProgress.wordle;
+  const guess = guessString;
+  console.log(`Curr guess: ${guess} | Wordle: ${wordle}`);
+  
+  for (let i = 0; i < 5; i++) {
+    let currTile = document.getElementById(`tile${gameProgress.currRow}${i}`);
+    let keyboardKey = document.getElementById(`${guess[i]} Key`);
+    const guessCharFrequency = checkCharFrequency(guess, guess[i])
+    const guessCharIndex = checkCharIndex(guess, guess[i], i)
+    const wordleCharFrequency = checkCharFrequency(wordle, guess[i])
+    const wordleCharIndex = checkCharIndex(wordle, wordle[i], i)
+
+    // if the character frequency is greater in the guess than that of the wordle and the character shows after the furthest index in that of the wordle, then that tile should be grey 
+      // example:
+        // wordle = ['A','A','B','C','D']
+        // guess = ['A','A','B','C','A'] <-- guess[4] is past its max index and occurences
+    // Why is this necessary? If the last A was highlighted 'yellow', the user would think that "A" needs to be used again but in a different index 
+
+    if ((guessCharFrequency > wordleCharFrequency && guessCharIndex > wordleCharIndex)) {
+      if (keyboardKey.classList.contains('correct') || keyboardKey.classList.contains('wrong-position')) {
+        currTile.classList.add('unused', 'animation');
       } else {
-          console.log('incorrect guess: ', guessString);
-          showGuess()
-          nextRow();
+        currTile.classList.add('unused', 'animation');
+        keyboardKey.classList.add('unused');
       }
+    } else {
+      if (guess[i] === wordle[i]) {
+        if (keyboardKey.classList.contains('wrong-position')) {
+          keyboardKey.classList.remove('class', 'wrong-position');
+        } else if (keyboardKey.classList.contains('unused')) {
+          keyboardKey.classList.remove('class', 'unused');
+        }
+        currTile.classList.add('correct', 'animation');
+        keyboardKey.classList.add('correct');
 
+      } else if (wordle.includes(guess[i])) {
+          if(keyboardKey.classList.contains('correct')) {
+            currTile.classList.add('wrong-position', 'animation');
+          } else {
+            keyboardKey.classList.add('wrong-position');
+            currTile.classList.add('wrong-position', 'animation');
+          }
+
+      } else {
+        if (keyboardKey.classList.contains('correct') || keyboardKey.classList.contains('wrong-position')) {
+          currTile.classList.add('unused', 'animation');
+        } else {
+          keyboardKey.classList.add('unused');
+          currTile.classList.add('unused', 'animation');
+        }
+      }
     }
   }
+  submitGuess();
+}
 
-  function nextRow () {
-    if (gameProgress.currRow === 5) {
-      return
+
+// check number of Frequency of a single character
+function checkCharFrequency (word, char) {
+  let charFrequency = 0;
+  for (let i = 0; i < word.length; i++) {
+    if (word[i] === char ) {
+      charFrequency ++;
     }
-    // console.log('currRow: ', gameProgress.currRow);
-    gameProgress.currRow++;
-    // console.log('new currRow after submit: ', gameProgress.currRow);
+  }
+  return charFrequency;
+}
+
+// check a character's index
+function checkCharIndex (word, char, index) {
+  let charIndex = 0;
+  for (let i = 0; i <= index; i++) {
+    if (word[i] === char) {
+      charIndex++;
+    }
+  }
+  return charIndex;
+}
+
+// after submit, go to next available row
+function submitGuess () {
+  const gameWon = gameProgress.currGuess === gameProgress.wordle;
+  const gameLoss = (gameProgress.currCol === 4 && gameProgress.currRow === 5 && gameProgress.currGuess !== gameProgress.wordle)
+  if (gameWon) {
+    console.log('game won');
+    finishGame('gameWon');
+    return
+  } else if (gameLoss) {
+    console.log('game over');
+    finishGame('gameLoss');
+    return
+  } else {
     gameProgress.currCol = 0;
-    gameProgress.currGuess = '';
-  }
-
-  // showguess() checks each character, its index and adds .correct class and animation to each tile
-    // check for all present characters in currGuess that are in the chosenWordle
-      // create a loop that cross references each present character's index with the character indexes of the chosenWordle
-        // if the currGuess character and it's index is === to those of the chosenWordle
-          // turn the tile "green"
-        // else if the currGuess character is present but not in the same position as that of the chosenWordle
-          //turn the tile "yellow"
-        // else turn the tile "grey"
-  function showGuess () {
+    gameProgress.currRow++;
     console.log(gameProgress.currGuess);
   }
+}
 
+function finishGame () {
+  gameProgress.gamesPlayed++;
+
+  if ('gameWon') {
+    gameProgress.gamesWon++;
+    gameProgress.currWinStreak++;
+    if (gameProgress.longestStreak > gameProgress.currWinStreak) {
+      return
+    } else {
+      gameProgress.longestStreak = gameProgress.currWinStreak
+    }
+
+  } else if ('gameLoss') {
+    gameProgress.currWinStreak = 0;
+  }
+  console.log('games played: ', gameProgress.gamesPlayed);
+  console.log('games won: ', gameProgress.gamesWon);
+  console.log('win rate: ', );
+  console.log('curr win streak: ', gameProgress.currWinStreak);
+  console.log('longest win streak: ', gameProgress.longestStreak);
 }

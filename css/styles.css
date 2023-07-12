@@ -97,17 +97,6 @@ body {
   font-size: 2.2rem; /*"'root em', a unit of measurement that represents the font size of the root element" - https://www.sitepoint.com/understanding-and-using-rem-units-in-css/ */
 }
 
-/* Tile Backgrounds after Submitted Attempts */
-.unused {
-  background-color: #2d2d2d;
-}
-.correct {
-  background-color: #3FA004;
-}
-.wrong-position {
-  background-color: #B4AC0A;
-}
-
 #keyboard-container {
   background-color: #393543;
   border: #000;
@@ -160,12 +149,24 @@ body {
   cursor: pointer;
 }
 
+/* Backgrounds for Delete and Submit Buttons */
 #delete-key {
   background-color: #494455;
 }
 
 #submit-key {
   background-color: #4BC157;
+}
+
+/* Tile Backgrounds after Submitted Attempts */
+.correct {
+  background-color: #3FA004;
+}
+.wrong-position {
+  background-color: #B4AC0A;
+}
+.unused {
+  background-color: #2d2d2d;
 }
 
 .game-text {
