@@ -1,6 +1,5 @@
 let gameProgress = {
   wordle: wordList[Math.floor(Math.random() * wordList.length) + 1],
-  // wordle: 'holty',
   grid: [
     ['','','','',''], 
     ['','','','',''], 
@@ -9,22 +8,38 @@ let gameProgress = {
     ['','','','',''], 
     ['','','','','']
   ],
+  keyboard: [
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L",],
+    ["Z", "X", "C", "V", "B", "N", "M",]
+  ],
   currRow: 0,
   currCol: 0,
   currGuess: '',
+  inProgress: true,
   gamesPlayed: 0,
   gamesWon: 0,
-  winRate: Math.floor(this.gamesWon/this.gamesPlayed * 100),
   currWinStreak: 0,
-  longestStreak: 0
+  longestStreak: 0,
+  instructionsShowing: false,
+  winRate () {
+    return Math.floor((this.gamesWon/this.gamesPlayed ) * 100)
+  },
+  newWordle () {
+    this.wordle = wordList[Math.floor(Math.random() * wordList.length) + 1]
+  }
 }
 
 function startup () {
-  console.log(gameProgress.wordle);
-  generateKeyboard()
-  generateGrid()
-  keyboardEventListener()
+  console.log('secret wordle: ', gameProgress.wordle);
+  gameProgress.gamesPlayed++;
+  generateKeyboard();
+  generateGrid();
+  keyboardEventListener();
+  generateNewWordleBtn();
+  generateInstructions();
 }
+
 startup()
 
 
@@ -67,13 +82,8 @@ function generateGrid() {
     // create a div for each key within that current row
     // give each div the ability to act as a virtual keyboard using event listener
 function generateKeyboard () {
+  let keyboard = gameProgress.keyboard;
   // generating keyboard character keys
-  const keyboard = [
-    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L",],
-    ["Z", "X", "C", "V", "B", "N", "M",]
-  ];
-
   for (let i = 0; i < keyboard.length; i++) {
     const keyboardContainer = document.getElementById('keyboard-keys-container')
     const row = keyboard[i];
@@ -108,7 +118,11 @@ function generateKeyboard () {
     button.textContent = nonCharKeys[i][1]
     button.addEventListener('click', (click) => {
       click.key = nonCharKeys[i][2]
-      updateTile(click.key)
+      if (click.key === 'Backspace') {
+        updateTile(click.key)
+      } else if (click.key === 'Enter' && gameProgress.inProgress === true) {
+        checkLength()
+      }
     })
     deleteSubmitKeysContainer.appendChild(button)
   }
@@ -125,32 +139,38 @@ function isCharKey (input) {
 // DOM event listener for user input via physical keyboard presses
 function keyboardEventListener () {
 document.addEventListener('keydown', (input) => {
-    if (isCharKey(input.key) || input.key === 'Enter' || input.key === 'Backspace') {
-      updateTile(input.key)
-    } 
-    else {return};
+    if (gameProgress.inProgress === true) {
+      if (isCharKey(input.key) || input.key === 'Backspace') {
+        updateTile(input.key)
+      } else if (input.key === 'Enter') {
+        checkLength()
+      }
+      else {return};
+    }
   });
 }
 
 
 function updateTile (input) {
+  if (gameProgress.inProgress !== true) {
+    return
+  }
+
   let grid = gameProgress.grid;
   let currRow = gameProgress.currRow;
   let currCol = gameProgress.currCol;
   let currTile = document.getElementById(`tile${currRow}${currCol}`)
   let prevTile = document.getElementById(`tile${currRow}${currCol-1}`)
 
-  if (input === 'Enter') {
-    checkLength();
-  }
-
   if (input === 'Backspace') {
     if (gameProgress.currCol === 0) {
       return
     } else {
-      prevTile.textContent = '';  // <-- remove previous tile.textContent
+      // gameProgress.currGuess.replace(`${gameProgress.currGuess[gameProgress.currCol]}`, '')
+      gameProgress.currGuess = gameProgress.currGuess.substring(gameProgress.currGuess[gameProgress.currCol], gameProgress.currGuess.length - 1); // <-- delete last character in gameProgress.currGuess
       gameProgress.currCol -= 1; // <-- move to previous tile, which is now empty
       grid[gameProgress.currRow][gameProgress.currCol] = ''; // <-- updates grid to reflect character removal
+      prevTile.textContent = '';  // <-- remove previous tile.textContent
       return
     }
   }
@@ -159,44 +179,30 @@ function updateTile (input) {
     input = input.toLowerCase()
     grid[gameProgress.currRow][gameProgress.currCol] = input; // <-- updates grid with character addition
     currTile.textContent = input; // <-- set's tile character
+    gameProgress.currGuess += input; // <-- updates currGuess
     gameProgress.currCol ++; // <-- after each input, go to next tile
     return
   };
-
-  // useful console.logs (use only before currCOl += 1)
-    // console.log('key pressed: ', input); // <-- check for 'keydown' event and which key was pressed
-    // console.log('curr grid row and grid col: ', grid.indexOf(grid[currRow]), 'x', grid[currRow].indexOf(input))
-    // console.log('curr grid text at curr grid row x curr grid col: ', grid[currRow][currCol]);
-    // console.log(grid[currRow]);
-    // console.log('input key: ', input)  // <-- logs all character inputs (DOM keyboard and user's keyboard)
-    // console.log('currCol: ' + currCol); //  <-- used as a cross reference with tile.id
-    // console.log('currRow: ' + currRow); // <-- used as a cross reference with tile.id
-    // console.log('currGuess: ', gameProgress.currGuess); // <-- tracks user's current guess attempt
-    // console.log('currTile: ', currTile); // <-- tracks current tile being affected
 }
 
 
 // check for length of currGuess
 function checkLength () {
-  const grid = gameProgress.grid;
-  const guessString = grid[gameProgress.currRow].join('');
-  if (guessString.length === 5) {
-    isValidGuess(guessString);
+  if (gameProgress.currGuess.length === 5) {
+    isValidGuess(gameProgress.currGuess);
   } else {
     return;
   }
+}
 
-  // check if guess is a usable word
-  function isValidGuess () {
-    if (wordList.includes(guessString) || guessList.includes(guessString)) {
-      gameProgress.currGuess = guessString;
-      checkGuess(guessString)
-    }
+// check if guess is a usable word
+function isValidGuess (guessString) {
+  if (wordList.includes(guessString) || guessList.includes(guessString)) {
+    checkGuess(guessString)
   }
 }
 
-
-
+// check each character of currGuess
 function checkGuess (guessString) {
   const wordle = gameProgress.wordle;
   const guess = guessString;
@@ -280,26 +286,29 @@ function checkCharIndex (word, char, index) {
 // after submit, go to next available row
 function submitGuess () {
   const gameWon = gameProgress.currGuess === gameProgress.wordle;
-  const gameLoss = (gameProgress.currCol === 4 && gameProgress.currRow === 5 && gameProgress.currGuess !== gameProgress.wordle)
-  if (gameWon) {
-    console.log('game won');
-    finishGame('gameWon');
-    return
-  } else if (gameLoss) {
-    console.log('game over');
-    finishGame('gameLoss');
-    return
-  } else {
-    gameProgress.currCol = 0;
-    gameProgress.currRow++;
-    console.log(gameProgress.currGuess);
-  }
+  const gameLoss = ((gameProgress.currCol === 5 && gameProgress.currRow === 5 )&& gameProgress.currGuess !== gameProgress.wordle)
+  
+  if (gameWon || gameLoss) {
+    gameProgress.inProgress = false;
+    if (gameWon) {
+      updateStats('gameWon');
+      return
+    } else if (gameLoss) {
+      updateStats('gameLoss');
+      return
+    } 
+  } else if (gameProgress.currRow < 5){
+      gameProgress.currGuess = '';
+      gameProgress.currCol = 0;
+      gameProgress.currRow++;
+      console.log(gameProgress.currGuess);
+    } 
 }
 
-function finishGame () {
-  gameProgress.gamesPlayed++;
 
-  if ('gameWon') {
+// update game stats
+function updateStats (gameOutcome) {
+  if (gameOutcome === 'gameWon') {
     gameProgress.gamesWon++;
     gameProgress.currWinStreak++;
     if (gameProgress.longestStreak > gameProgress.currWinStreak) {
@@ -307,13 +316,206 @@ function finishGame () {
     } else {
       gameProgress.longestStreak = gameProgress.currWinStreak
     }
+    confirmNewGame('gameWon');
 
-  } else if ('gameLoss') {
+  } else if (gameOutcome === 'gameLoss') {
     gameProgress.currWinStreak = 0;
+    confirmNewGame('gameLoss')
   }
-  console.log('games played: ', gameProgress.gamesPlayed);
-  console.log('games won: ', gameProgress.gamesWon);
-  console.log('win rate: ', );
-  console.log('curr win streak: ', gameProgress.currWinStreak);
-  console.log('longest win streak: ', gameProgress.longestStreak);
 }
+
+
+
+function confirmNewGame (gameOutcome) {
+  // add stats tracker
+  generateStats();
+
+  // create new game button
+  generateNewGameBtn();
+
+  // add results prompt
+  const feedback = document.getElementById('nav-new-wordle')
+  feedback.classList.add('game-text')
+  feedback.style.textDecoration = 'underline'
+  feedback.textContent = '';
+  if (gameOutcome === 'gameWon'){
+    let gameWonPrompt = '';
+    if (gameProgress.currRow === 0) {
+      gameWonPrompt = 'You\'re a genius!';
+    } else if (gameProgress.currRow >= 1 && gameProgress.currRow <= 3) {
+      gameWonPrompt = 'Wow! You\'re pretty good.';
+    } else {
+      gameWonPrompt = 'Congratualions! You solved the wordle.';
+    }
+    feedback.textContent = gameWonPrompt;
+    
+  } else if (gameOutcome === 'gameLoss'){
+    console.log('nice try');
+    feedback.textContent = 'Nice try!';
+  }
+}
+
+
+function startNewGame () {
+  //update game stats and game progress to reflect new game
+  gameProgress.gamesPlayed++;
+  gameProgress.currRow = 0;
+  gameProgress.currCol = 0;
+  gameProgress.currGuess = '';
+  gameProgress.inProgress = true;
+  gameProgress.newWordle();
+  gameProgress.grid = [
+    ['','','','',''], 
+    ['','','','',''], 
+    ['','','','',''], 
+    ['','','','',''], 
+    ['','','','',''], 
+    ['','','','','']
+  ];
+
+  
+  // show 'new-wordle-btn'
+  document.getElementById('nav-new-wordle').textContent = '';
+  generateNewWordleBtn()
+
+  
+  // remove stats tracker and start new game button
+  if (document.getElementById('results-div').contains(document.getElementById('confirmation-btn'))) {
+    document.getElementById('confirmation-btn').remove();
+  }
+  if (document.getElementById('results-div').contains(document.getElementById('results-aside'))) {
+    document.getElementById('results-aside').remove();
+  }
+  
+
+  // reset tile classes and textContent
+  for (let i = 0; i <= 5; i++) {
+    for (let j = 0; j <= 4; j++) {
+      let currTile = document.getElementById(`tile${i}${j}`);
+      currTile.textContent = '';
+      currTile.setAttribute('class', 'tile')
+    }
+  }
+
+  // reset keyboard character keys
+  let keyboard = gameProgress.keyboard;
+  for (let i = 0; i < keyboard.length; i++) {
+    const row = keyboard[i];
+    
+    for (let j = 0; j < row.length; j++) {
+      const character = row[j].toLowerCase();
+      const characterKey = document.getElementById(character + " Key")
+      characterKey.setAttribute('class', 'char-key');
+    }
+  }
+}
+
+function generateNewWordleBtn () {
+  const feedback = document.getElementById('nav-new-wordle');
+  const newWordleBtn = document.createElement('button');
+  newWordleBtn.textContent = 'New Wordle Please!'
+  newWordleBtn.id = 'new-wordle-btn'
+  newWordleBtn.classList.add('game-text', 'button')
+  newWordleBtn.addEventListener('click', () => {
+    startNewGame();
+    gameProgress.currWinStreak = 0
+  })
+  feedback.appendChild(newWordleBtn);
+  console.log(gameProgress.currWinStreak);
+  console.log(gameProgress.longestStreak);
+}
+
+
+
+function generateStats () {
+  const resultsDiv = document.getElementById('results-div');
+  
+  const statsAside = document.createElement('aside');
+    statsAside.id = 'results-aside';
+    statsAside.classList.add('game-text', 'aside');
+  
+  const resultsUl = document.createElement('ul');
+    resultsUl.setAttribute('class', 'results-ul');
+
+  const statsArray = ['games-played', 'win-rate', 'curr-win-streak', 'longest-win-streak'];
+  const statText = [
+      `Games Played: ${gameProgress.gamesPlayed}`, 
+      `Win Rate: ${gameProgress.winRate()}%`,
+      `Current Win Streak: ${gameProgress.currWinStreak}`,
+      `Longest Win Streak: ${gameProgress.longestStreak}`
+    ]
+
+  for (let i = 0; i < statsArray.length; i++) {
+    const stat = document.createElement('li');
+    const statName = statsArray[i];
+    stat.id = statName;
+    stat.classList.add('results-li');
+    stat.textContent = statText[i]
+    resultsUl.appendChild(stat);
+  }
+  resultsDiv.appendChild(statsAside)
+  statsAside.appendChild(resultsUl)
+}
+
+
+
+
+function generateNewGameBtn () {
+  const resultsDiv = document.getElementById('results-div')
+  const startNewGameBtn = document.createElement('button');
+    startNewGameBtn.textContent = 'Play Again?';
+    startNewGameBtn.setAttribute('id', 'confirmation-btn')
+    startNewGameBtn.classList.add('non-char-keys', 'correct')
+    startNewGameBtn.addEventListener('click', function() {
+      startNewGame();
+    })
+    resultsDiv.appendChild(startNewGameBtn)
+}
+
+function generateInstructions () {
+  const instructionsDiv = document.getElementById('instructions-div');
+  
+  const instructionsAside = document.createElement('aside');
+    instructionsAside.id = 'instructions-aside';
+    instructionsAside.classList.add('game-text', 'aside')
+
+  const instructionsOl = document.createElement('ol')
+    instructionsOl.setAttribute('class', 'instructions-ol')
+
+  instructionsArray = [
+    'You have six tries to guess the five-letter word!',
+    'Type in your guess and submit your word.',
+    'The tiles will turn "Green" if the letter is present and in the correct spot. The tile will turn "Yellow" if you guessed the right letter, but it\'s in the wrong spot. A "Gray" tile means that the letter is not included in the word!',
+    'Keep guessing until you solve the Wordle!'
+  ]
+  
+  for (let i = 0; i < instructionsArray.length; i++) {
+    const instructionText = instructionsArray[i];
+    const instruction = document.createElement('li');
+    const lineBreak = document.createElement('br');
+    instruction.textContent = instructionText;
+    instructionsOl.appendChild(instruction);
+
+    if (i < 3) {
+      instructionsOl.appendChild(lineBreak);
+    }
+  }
+
+  instructionsDiv.appendChild(instructionsAside);
+  instructionsAside.appendChild(instructionsOl);
+  instructionsAside.style.visibility = 'hidden';
+}
+
+
+// show and hide instructions
+const instructionsAside = document.getElementById('instructions-aside')
+const howToPlaybtn = document.getElementById('instructions-btn')
+howToPlaybtn.addEventListener('click', () => {
+  if (gameProgress.instructionsShowing === false) {
+    instructionsAside.style.visibility = 'visible';
+    gameProgress.instructionsShowing = true;
+  } else if (gameProgress.instructionsShowing === true){
+    instructionsAside.style.visibility = 'hidden';
+    gameProgress.instructionsShowing = false;
+  }
+})

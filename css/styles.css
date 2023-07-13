@@ -2,6 +2,10 @@
 
 body {
   background-color: #494455;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
 }
 
 #game-container {
@@ -37,6 +41,7 @@ body {
   padding: 8px 5px 8px 5px;
   background-color: #ebdca8;
   align-items: center;
+  filter: drop-shadow(-2px 3px 2px #000);
 }
 
 #game-tiles-div {
@@ -45,8 +50,8 @@ body {
 }
 
 #results-aside {
-  flex-direction: column;
   line-height: 130%;
+  filter: drop-shadow(2px 3px 2px #000);
 }
 
 .instructions-ol {
@@ -123,6 +128,13 @@ body {
   justify-content: space-evenly;
 }
 
+#confirmation-btn {
+  margin-top: 10px;
+  filter: drop-shadow(2px 3px 2px #000);
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .char-key {
   width: 35px;
   background-color: #878787;
@@ -141,7 +153,6 @@ body {
   width: 80%;
   height: 15%;
   color: #fff;
-  align-self: center;
   border-radius: 5px;
   border: none;
   filter: drop-shadow(-2px 3px 2px #000);
@@ -172,7 +183,6 @@ body {
 .game-text {
   font-family: 'Main Text';
   color: #fff;
-  filter: drop-shadow(-2px 3px 2px #000);
   font-size: 40px;
   text-align: center;
 }
@@ -185,10 +195,28 @@ body {
   color: #fff;
 }
 
+.confirmation-btn {
+  width: 60px;
+  height: 30px;
+  filter: drop-shadow(2px 3px 2px #000);
+}
+
+#result-prompt {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 
 .nav-item {
   width:33%;
   text-align: center;
+}
+
+#instructions-btn {
+  filter: drop-shadow(-2px 3px 2px #000);
+}
+
+#new-wordle-btn {
+  filter: drop-shadow(2px 3px 2px #000);
 }
 
 #wordle-title {
