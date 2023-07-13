@@ -219,6 +219,38 @@ body {
   filter: drop-shadow(2px 3px 2px #000);
 }
 
+.wordle-reveal {
+  width: fit-content;
+  padding:2px;
+  padding-inline: 8px;
+  border-radius: 4px;
+  margin: auto;  
+  font-family: 'Tile Text';
+  font-size: 29px;
+  color: #fff;
+  background: #4BC157;
+  filter: drop-shadow(0px 3px 1px #2b2828);
+}
+
+.flip {
+  animation: flip 0.4s ease;
+}
+
+@keyframes flip {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+  /* 0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(-180deg); }
+  100% { transform: rotateY(-360deg); } */
+}
+
 #wordle-title {
   font-size: 90px;
   margin-top: 50px;

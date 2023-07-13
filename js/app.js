@@ -31,7 +31,6 @@ let gameProgress = {
 }
 
 function startup () {
-  console.log('secret wordle: ', gameProgress.wordle);
   gameProgress.gamesPlayed++;
   generateKeyboard();
   generateGrid();
@@ -206,57 +205,64 @@ function isValidGuess (guessString) {
 function checkGuess (guessString) {
   const wordle = gameProgress.wordle;
   const guess = guessString;
-  console.log(`Curr guess: ${guess} | Wordle: ${wordle}`);
+  animationDelay = 500;
   
-  for (let i = 0; i < 5; i++) {
-    let currTile = document.getElementById(`tile${gameProgress.currRow}${i}`);
-    let keyboardKey = document.getElementById(`${guess[i]} Key`);
-    const guessCharFrequency = checkCharFrequency(guess, guess[i])
-    const guessCharIndex = checkCharIndex(guess, guess[i], i)
-    const wordleCharFrequency = checkCharFrequency(wordle, guess[i])
-    const wordleCharIndex = checkCharIndex(wordle, wordle[i], i)
 
-    // if the character frequency is greater in the guess than that of the wordle and the character shows after the furthest index in that of the wordle, then that tile should be grey 
-      // example:
-        // wordle = ['A','A','B','C','D']
-        // guess = ['A','A','B','C','A'] <-- guess[4] is past its max index and occurences
-    // Why is this necessary? If the last A was highlighted 'yellow', the user would think that "A" needs to be used again but in a different index 
+  
+    for (let i = 0; i < 5; i++) {
+      let currTile = document.getElementById(`tile${gameProgress.currRow}${i}`);
+      let keyboardKey = document.getElementById(`${guess[i]} Key`);
+      const guessCharFrequency = checkCharFrequency(guess, guess[i])
+      const guessCharIndex = checkCharIndex(guess, guess[i], i)
+      const wordleCharFrequency = checkCharFrequency(wordle, guess[i])
+      const wordleCharIndex = checkCharIndex(wordle, wordle[i], i)
 
-    if ((guessCharFrequency > wordleCharFrequency && guessCharIndex > wordleCharIndex)) {
-      if (keyboardKey.classList.contains('correct') || keyboardKey.classList.contains('wrong-position')) {
-        currTile.classList.add('unused', 'animation');
-      } else {
-        currTile.classList.add('unused', 'animation');
-        keyboardKey.classList.add('unused');
-      }
-    } else {
-      if (guess[i] === wordle[i]) {
-        if (keyboardKey.classList.contains('wrong-position')) {
-          keyboardKey.classList.remove('class', 'wrong-position');
-        } else if (keyboardKey.classList.contains('unused')) {
-          keyboardKey.classList.remove('class', 'unused');
-        }
-        currTile.classList.add('correct', 'animation');
-        keyboardKey.classList.add('correct');
-
-      } else if (wordle.includes(guess[i])) {
-          if(keyboardKey.classList.contains('correct')) {
-            currTile.classList.add('wrong-position', 'animation');
-          } else {
-            keyboardKey.classList.add('wrong-position');
-            currTile.classList.add('wrong-position', 'animation');
-          }
-
-      } else {
+      // if the character frequency is greater in the guess than that of the wordle and the character shows after the furthest index in that of the wordle, then that tile should be grey 
+        // example:
+          // wordle = ['A','A','B','C','D']
+          // guess = ['A','A','B','C','A'] <-- guess[4] is past its max index and occurences
+      // Why is this necessary? If the last A was highlighted 'yellow', the user would think that "A" needs to be used again but in a different index 
+      setTimeout(() => {
+      if ((guessCharFrequency > wordleCharFrequency && guessCharIndex > wordleCharIndex)) {
         if (keyboardKey.classList.contains('correct') || keyboardKey.classList.contains('wrong-position')) {
-          currTile.classList.add('unused', 'animation');
+          currTile.classList.add('unused', 'flip');
         } else {
+          currTile.classList.add('unused', 'flip');
           keyboardKey.classList.add('unused');
-          currTile.classList.add('unused', 'animation');
+        }
+      } else {
+        if (guess[i] === wordle[i]) {
+          if (keyboardKey.classList.contains('wrong-position')) {
+            keyboardKey.classList.remove('class', 'wrong-position');
+          } else if (keyboardKey.classList.contains('unused')) {
+            keyboardKey.classList.remove('class', 'unused');
+          }
+          currTile.classList.add('correct', 'flip');
+          keyboardKey.classList.add('correct');
+
+        } else if (wordle.includes(guess[i])) {
+            if(keyboardKey.classList.contains('correct')) {
+              currTile.classList.add('wrong-position', 'flip');
+            } else {
+              keyboardKey.classList.add('wrong-position');
+              currTile.classList.add('wrong-position', 'flip');
+            }
+
+        } else {
+          if (keyboardKey.classList.contains('correct') || keyboardKey.classList.contains('wrong-position')) {
+            currTile.classList.add('unused', 'flip');
+          } else {
+            keyboardKey.classList.add('unused');
+            currTile.classList.add('unused', 'flip');
+          }
         }
       }
-    }
+      
+      // i + 1 is used to increase delay time for each following iteration to create staggered effect
+    }, ((i + 1) + animationDelay)/2)
+    animationDelay += 100;
   }
+
   submitGuess();
 }
 
@@ -301,7 +307,6 @@ function submitGuess () {
       gameProgress.currGuess = '';
       gameProgress.currCol = 0;
       gameProgress.currRow++;
-      console.log(gameProgress.currGuess);
     } 
 }
 
@@ -327,32 +332,36 @@ function updateStats (gameOutcome) {
 
 
 function confirmNewGame (gameOutcome) {
-  // add stats tracker
-  generateStats();
+  setTimeout(() => {
+    // show wordle
+    displayWordle();
 
-  // create new game button
-  generateNewGameBtn();
+    // add stats tracker
+    generateStats();
 
-  // add results prompt
-  const feedback = document.getElementById('nav-new-wordle')
-  feedback.classList.add('game-text')
-  feedback.style.textDecoration = 'underline'
-  feedback.textContent = '';
-  if (gameOutcome === 'gameWon'){
-    let gameWonPrompt = '';
-    if (gameProgress.currRow === 0) {
-      gameWonPrompt = 'You\'re a genius!';
-    } else if (gameProgress.currRow >= 1 && gameProgress.currRow <= 3) {
-      gameWonPrompt = 'Wow! You\'re pretty good.';
-    } else {
-      gameWonPrompt = 'Congratualions! You solved the wordle.';
+    // create new game button
+    generateNewGameBtn();
+
+    // add results prompt
+    const feedback = document.getElementById('nav-new-wordle')
+    feedback.classList.add('game-text')
+    feedback.style.textDecoration = 'underline'
+    feedback.textContent = '';
+    if (gameOutcome === 'gameWon'){
+      let gameWonPrompt = '';
+      if (gameProgress.currRow === 0) {
+        gameWonPrompt = 'You\'re a genius!';
+      } else if (gameProgress.currRow >= 1 && gameProgress.currRow <= 3) {
+        gameWonPrompt = 'Wow! You\'re pretty good.';
+      } else {
+        gameWonPrompt = 'Congratualions! You solved the wordle.';
+      }
+      feedback.textContent = gameWonPrompt;
+      
+    } else if (gameOutcome === 'gameLoss'){
+      feedback.textContent = 'Nice try!';
     }
-    feedback.textContent = gameWonPrompt;
-    
-  } else if (gameOutcome === 'gameLoss'){
-    console.log('nice try');
-    feedback.textContent = 'Nice try!';
-  }
+  }, 1000)
 }
 
 
@@ -386,6 +395,9 @@ function startNewGame () {
   if (document.getElementById('results-div').contains(document.getElementById('results-aside'))) {
     document.getElementById('results-aside').remove();
   }
+
+  // remove wordle reveal
+  document.querySelector('p.wordle-reveal').remove()
   
 
   // reset tile classes and textContent
@@ -410,6 +422,7 @@ function startNewGame () {
   }
 }
 
+
 function generateNewWordleBtn () {
   const feedback = document.getElementById('nav-new-wordle');
   const newWordleBtn = document.createElement('button');
@@ -421,8 +434,6 @@ function generateNewWordleBtn () {
     gameProgress.currWinStreak = 0
   })
   feedback.appendChild(newWordleBtn);
-  console.log(gameProgress.currWinStreak);
-  console.log(gameProgress.longestStreak);
 }
 
 
@@ -519,3 +530,14 @@ howToPlaybtn.addEventListener('click', () => {
     gameProgress.instructionsShowing = false;
   }
 })
+
+// Display wordle at end of game
+function displayWordle () {
+  const wordleRevealDiv = document.getElementById('wordle-reveal-div');
+  const wordleDisplay = document.createElement('p')
+  wordleDisplay.classList.add('wordle-reveal')
+  wordleRevealDiv.appendChild(wordleDisplay)
+  if (gameProgress.inProgress === false) {
+    wordleDisplay.textContent = gameProgress.wordle
+  }
+}

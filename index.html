@@ -17,34 +17,17 @@
           <div id="nav-instructions" class="nav-item ">
             <button id="instructions-btn" class="game-text button">How to Play</button>
           </div>
+          <div id="wordle-reveal-div" class="nav-item"></div>
           <div id="nav-new-wordle" class="nav-item"></div>
         </nav>
       </div>
       <div id="instructions-tiles-results-div">
-        <!-- (JS) Upon page load, hide instructions until "How To Play" button is clicked -->
         <div id="instructions-div" class="side-div">
-          <!-- <aside id="instructions-aside" class="game-text aside"> 
-            <ol class="instructions-ol">
-              <li>You have <u>six</u> tries to guess the five-letter word!</li><br>
-              <li>Type in your guess and submit your word.</li><br>
-              <li>The tiles will turn <u><span style="color:#3FA004">Green</span></u> if the letter is present and in the correct spot. The tile will turn <u><span style="color:#B4AC0A">Yellow</span></u> if you guessed the right letter, but it's in the wrong spot. A <u><span style="color:#2d2d2d">Gray</span></u> tile means that the letter is not included in the word!</li><br>
-              <li>Keep guessing until you solve the Wordle!</li>
-            </ol>
-          </aside> -->
         </div>
         <div id="game-tiles-div">
           <div id="game-tiles"></div>
         </div>
         <div id="results-div" class="side-div">
-          <!-- (JS) When win conditions are met, append "#results-aside" to "#results-div" -->
-          <!-- <aside id="results-aside" class="game-text aside">
-            <ul class="results-ul">
-              <li id="games-played-tracker" class="results-li">Games Played: <span id="games-played">0</span></li>
-              <li id="win-rate-tracker" class="results-li">Win Rate: <span id="win-rate">0</span>%</li>
-              <li id="curr-win-streak-tracker" class="results-li">Current Win Streak: <span id="curr-win-streak">0</span></li>
-              <li id="longest-win-streak-tracker" class="results-li">Longest Win Streak: <span id="longest-win-streak">0</span></li>
-            </ul>
-          </aside> -->
         </div>
       </div>
     </div>
