@@ -1,3 +1,4 @@
+// game progress tracker for all crucial variables
 let gameProgress = {
   wordle: wordList[Math.floor(Math.random() * wordList.length) + 1],
   grid: [
@@ -38,34 +39,12 @@ function startup () {
   generateNewWordleBtn();
   generateInstructions();
 }
-
 startup()
 
 
-// create a function that takes in parameters for specific grid coordinates
-  // "row" argument will be assigned via loop
-  // "col" aka "column" will be assigned via loop
-  // "char" or "character" will be assigned via user input
-function createTile(row, col) {
-  const tile = document.createElement('div');
-  // use .className and .id instead of setAttribute() to be less verbose
-    // "The className property of the Element interface gets and sets the value of the class attribute of the specified element." - MDN
-    // "The id property of the Element interface represents the element's identifier, reflecting the id global attribute." - MDN
-  // Give the tile a specific id with coordinates
-    // Use textContent instead of innerText because the text within the tile is a child of tile element
-    // "The textContent property of the Node interface represents the text content of the node and its descendants." - MDN
-    tile.className = 'tile';
-    tile.id = `tile${row}${col}`;
-    tile.textContent = '';
-  // Append tile (child) to grid (parent)
-  const gameGrid = document.getElementById('game-tiles')
-  gameGrid.appendChild(tile)
-}
-
 // Create a function that generates grid with tiles
 function generateGrid() {
-  //create a nested loop that generates 6 rows and for every row, generate 5 columns
-    // outer loop generates 6 rows
+  // generates 6 rows
   for (let r = 0; r < 6; r++) {
     // inner loop generates 5 columns
     for (let c = 0; c < 5; c++) {
@@ -74,12 +53,22 @@ function generateGrid() {
   }
 }
 
-// Create function that generates keyboard keys
-  // keyboards have (3) rows
-  // each row will contain a specified number of characters
-  // create a for loop that iterates each nested array (row of characters)
-    // create a div for each key within that current row
-    // give each div the ability to act as a virtual keyboard using event listener
+// create a function that takes in parameters from specific grid coordinates
+  // "row" argument will be assigned via loop
+  // "col" aka "column" will be assigned via loop
+function createTile(row, col) {
+  const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.id = `tile${row}${col}`;
+    tile.textContent = '';
+
+  // Append tile (child) to grid (parent)
+  const gameGrid = document.getElementById('game-tiles')
+  gameGrid.appendChild(tile)
+}
+
+
+// Create function that generates keyboard keys, submit button and delete button
 function generateKeyboard () {
   let keyboard = gameProgress.keyboard;
   // generating keyboard character keys
@@ -95,7 +84,7 @@ function generateKeyboard () {
       const characterKey = document.createElement('div');
       characterKey.setAttribute('class', 'char-key');
       characterKey.id = character + " Key";
-      characterKey.textContent = character;
+      characterKey.textContent = character; //<-- "innerText is defined only for HTMLElement objects, while textContent is defined for all Node objects." - https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext 
       // Add 'click' functionality to DOM keyboard
       characterKey.addEventListener('click', (input) => {
         input.key = character.toLowerCase();
@@ -149,7 +138,7 @@ document.addEventListener('keydown', (input) => {
   });
 }
 
-
+// update tile.textContent if input is a character or remove tile.textContent if input is "Backspace"
 function updateTile (input) {
   if (gameProgress.inProgress !== true) {
     return
@@ -207,8 +196,6 @@ function checkGuess (guessString) {
   const guess = guessString;
   animationDelay = 500;
   
-
-  
     for (let i = 0; i < 5; i++) {
       let currTile = document.getElementById(`tile${gameProgress.currRow}${i}`);
       let keyboardKey = document.getElementById(`${guess[i]} Key`);
@@ -257,9 +244,7 @@ function checkGuess (guessString) {
           }
         }
       }
-      
-      // i + 1 is used to increase delay time for each following iteration to create staggered effect
-    }, ((i + 1) + animationDelay)/2)
+    }, ((i + 1) + animationDelay)/2) // <-- i + 1 is used to increase delay time for each following iteration to create staggered effect
     animationDelay += 100;
   }
 
@@ -365,8 +350,8 @@ function confirmNewGame (gameOutcome) {
 }
 
 
+//update game stats and game progress to reflect new game
 function startNewGame () {
-  //update game stats and game progress to reflect new game
   gameProgress.gamesPlayed++;
   gameProgress.currRow = 0;
   gameProgress.currCol = 0;
@@ -422,7 +407,7 @@ function startNewGame () {
   }
 }
 
-
+// generateNewWordleBtn
 function generateNewWordleBtn () {
   const feedback = document.getElementById('nav-new-wordle');
   const newWordleBtn = document.createElement('button');
@@ -437,7 +422,7 @@ function generateNewWordleBtn () {
 }
 
 
-
+// generateStats
 function generateStats () {
   const resultsDiv = document.getElementById('results-div');
   
@@ -469,8 +454,7 @@ function generateStats () {
 }
 
 
-
-
+// generateNewGameBtn
 function generateNewGameBtn () {
   const resultsDiv = document.getElementById('results-div')
   const startNewGameBtn = document.createElement('button');
@@ -483,6 +467,8 @@ function generateNewGameBtn () {
     resultsDiv.appendChild(startNewGameBtn)
 }
 
+
+// generateInstructions
 function generateInstructions () {
   const instructionsDiv = document.getElementById('instructions-div');
   
@@ -530,6 +516,7 @@ howToPlaybtn.addEventListener('click', () => {
     gameProgress.instructionsShowing = false;
   }
 })
+
 
 // Display wordle at end of game
 function displayWordle () {
