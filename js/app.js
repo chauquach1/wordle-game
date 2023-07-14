@@ -379,11 +379,7 @@ function startNewGame () {
   }
   if (document.getElementById('results-div').contains(document.getElementById('results-aside'))) {
     document.getElementById('results-aside').remove();
-  }
-
-  // remove wordle reveal
-  document.querySelector('p.wordle-reveal').remove()
-  
+  }  
 
   // reset tile classes and textContent
   for (let i = 0; i <= 5; i++) {
