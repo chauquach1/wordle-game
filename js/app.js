@@ -244,8 +244,8 @@ function checkGuess (guessString) {
           }
         }
       }
-    }, ((i + 1) + animationDelay)/2) // <-- i + 1 is used to increase delay time for each following iteration to create staggered effect
-    animationDelay += 100;
+    }, (animationDelay)/2)
+    animationDelay += 100; // <-- increase animation delay for staggered "flip" effect
   }
 
   submitGuess();
