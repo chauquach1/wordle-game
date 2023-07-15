@@ -10,4 +10,5 @@ Getting Started: ( https://chauquach1.github.io/wordle-game/ ) Have fun!
 Next Steps: 
 ```
 Improve Mobile Compatability
+Improve Compatability for Variety of Desktop Display Resolutions
 ```
