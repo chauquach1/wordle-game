@@ -382,6 +382,7 @@ function startNewGame () {
   }
 
   // remove wordle reveal
+  if (document.querySelector('p.wordle-reveal'))
   document.querySelector('p.wordle-reveal').remove()
   
 
